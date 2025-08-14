@@ -3,13 +3,14 @@ require "rails_helper"
 RSpec.describe PurchasesController, type: :controller do
   let(:company) { create(:company) }
   let(:user) { create(:user, company: company) }
+  let(:item) { create(:item, company: company) } # <-- item para satisfazer foreign key
 
   let(:valid_params) do
-    { purchase: { item_name: "Item A", price: 100, weight: 10 } }
+    { purchase: { item_name: "Item A", price: 100, weight: 10, item_id: item.id } }
   end
 
   let(:invalid_params) do
-    { purchase: { item_name: "", price: nil, weight: nil } }
+    { purchase: { item_name: "", price: nil, weight: nil, item_id: nil } }
   end
 
   before do
@@ -27,7 +28,7 @@ RSpec.describe PurchasesController, type: :controller do
 
   describe "GET #show" do
     it "returns success" do
-      purchase = create(:purchase, company: company)
+      purchase = create(:purchase, company: company, item: item)
       get :show, params: { id: purchase.id }
       expect(response).to have_http_status(:ok)
     end
@@ -63,13 +64,13 @@ RSpec.describe PurchasesController, type: :controller do
 
       it "renders new template again" do
         post :create, params: invalid_params
-        expect(response).to have_http_status(:unprocessable_content) # novo status
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
 
   describe "PATCH #update" do
-    let(:purchase) { create(:purchase, company: company, item_name: "Old Name") }
+    let(:purchase) { create(:purchase, company: company, item: item, item_name: "Old Name") }
 
     it "updates the purchase" do
       patch :update, params: { id: purchase.id, purchase: { item_name: "New Name" } }
@@ -80,7 +81,7 @@ RSpec.describe PurchasesController, type: :controller do
 
   describe "DELETE #destroy" do
     it "deletes the purchase" do
-      purchase = create(:purchase, company: company)
+      purchase = create(:purchase, company: company, item: item)
       expect {
         delete :destroy, params: { id: purchase.id }
       }.to change(Purchase, :count).by(-1)

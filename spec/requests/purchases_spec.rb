@@ -3,13 +3,15 @@ require "rails_helper"
 RSpec.describe "/purchases", type: :request do
   let(:company) { create(:company) }
   let(:user) { create(:user, company: company) }
+  let(:item) { create(:item, company: company) } # <-- create an item to satisfy foreign key
 
   let(:valid_attributes) do
     {
       item_name: "Item A",
       price: 100,
       weight: 10,
-      company_id: company.id
+      company_id: company.id,
+      item_id: item.id
     }
   end
 
@@ -18,20 +20,22 @@ RSpec.describe "/purchases", type: :request do
       item_name: "",
       price: nil,
       weight: nil,
-      company_id: nil
+      company_id: nil,
+      item_id: nil
     }
   end
 
   before do
-    # Sign in the user for Devise
-    sign_in user
+    # Simulate logged-in user without Devise
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
   end
 
   describe "GET /index" do
     it "renders a successful response" do
       Purchase.create!(valid_attributes)
       get purchases_url
-      expect(response).to be_successful
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -39,14 +43,14 @@ RSpec.describe "/purchases", type: :request do
     it "renders a successful response" do
       purchase = Purchase.create!(valid_attributes)
       get purchase_url(purchase)
-      expect(response).to be_successful
+      expect(response).to have_http_status(:ok)
     end
   end
 
   describe "GET /new" do
     it "renders a successful response" do
       get new_purchase_url
-      expect(response).to be_successful
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -54,7 +58,7 @@ RSpec.describe "/purchases", type: :request do
     it "renders a successful response" do
       purchase = Purchase.create!(valid_attributes)
       get edit_purchase_url(purchase)
-      expect(response).to be_successful
+      expect(response).to have_http_status(:ok)
     end
   end
 
@@ -79,7 +83,7 @@ RSpec.describe "/purchases", type: :request do
         }.not_to change(Purchase, :count)
       end
 
-      it "renders a response with 422 status (i.e. to display the 'new' template)" do
+      it "renders a response with 422 status" do
         post purchases_url, params: { purchase: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_content)
       end
