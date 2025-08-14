@@ -8,7 +8,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     services:
@@ -31,23 +30,22 @@ jobs:
       DATABASE_URL: postgres://postgres:postgres@localhost:5432/ermeltech_saas_test
 
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: 3.3
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.3
 
-    - name: Install dependencies
-      run: |
-        gem install bundler
-        bundle install --jobs 4 --retry 3
+      - name: Install dependencies
+        run: |
+          gem install bundler
+          bundle install --jobs 4 --retry 3
 
-    - name: Set up database
-      run: |
-        bundle exec rails db:create
-        bundle exec rails db:schema:load
+      - name: Set up database
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
 
-    - name: Run tests
-      run: |
-        bundle exec rails test
+      - name: Run tests
+        run: bundle exec rspec
