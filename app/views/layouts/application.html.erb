@@ -29,6 +29,7 @@
         <li><%= link_to "Home", root_path %></li>
         <li><%= link_to "Companies", companies_path %></li>
         <li><%= link_to "Items", items_path %></li>
+        <li><%= link_to "Compras", purchases_path %></li> <!-- Nova linha aqui -->
         <% if user_signed_in? %>
           <li><%= link_to "Edit Profile", edit_user_registration_path %></li>
           <li><%= link_to "Logout", destroy_user_session_path, method: :delete %></li>
