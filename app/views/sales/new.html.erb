@@ -1,0 +1,14 @@
+<% content_for :title, "Nova Venda" %>
+
+<div class="mb-3">
+  <%= link_to "← Voltar", sales_path, class: "btn btn-outline-secondary" %>
+</div>
+
+<div class="card shadow">
+  <div class="card-header bg-light">
+    <h4>Nova Venda</h4>
+  </div>
+  <div class="card-body">
+    <%= render "form", sale: @sale, items: @items %>
+  </div>
+</div>

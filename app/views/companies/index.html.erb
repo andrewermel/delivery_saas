@@ -1,16 +1,14 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "Empresas" %>
 
-<% content_for :title, "Companies" %>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">Empresas</h1>
+  <%= link_to "Nova empresa", new_company_path, class: "btn btn-primary" %>
+ </div>
 
-<h1>Companies</h1>
-
-<div id="companies">
+<div id="companies" class="row g-3">
   <% @companies.each do |company| %>
-    <%= render company %>
-    <p>
-      <%= link_to "Show this company", company %>
-    </p>
+    <div class="col-md-6 col-lg-4">
+      <%= render company %>
+    </div>
   <% end %>
 </div>
-
-<%= link_to "New company", new_company_path %>

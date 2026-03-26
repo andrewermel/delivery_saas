@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_08_14_132055) do
+ActiveRecord::Schema[8.0].define(version: 2025_08_14_140300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -21,6 +21,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_132055) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "inventories", force: :cascade do |t|
+    t.bigint "item_id", null: false
+    t.bigint "company_id", null: false
+    t.integer "quantity_change", null: false, comment: "Positivo para entrada (compra), negativo para saída (venda)"
+    t.string "movement_type", null: false, comment: "purchase ou sale"
+    t.bigint "purchase_id"
+    t.bigint "sale_id"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id"], name: "index_inventories_on_company_id"
+    t.index ["item_id", "created_at"], name: "index_inventories_on_item_and_created_at"
+    t.index ["item_id"], name: "index_inventories_on_item_id"
+    t.index ["movement_type"], name: "index_inventories_on_movement_type"
+    t.index ["purchase_id"], name: "index_inventories_on_purchase_id"
+    t.index ["sale_id"], name: "index_inventories_on_sale_id"
+  end
+
   create_table "items", force: :cascade do |t|
     t.string "name"
     t.decimal "weight"
@@ -28,6 +46,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_132055) do
     t.bigint "company_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "quantity_in_stock", default: 0, null: false
     t.index ["company_id"], name: "index_items_on_company_id"
   end
 
@@ -36,10 +55,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_132055) do
     t.bigint "item_id"
     t.decimal "price"
     t.decimal "weight"
-    t.integer "company_id"
+    t.bigint "company_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["item_id"], name: "index_purchases_on_item_id"
+  end
+
+  create_table "sales", force: :cascade do |t|
+    t.bigint "item_id", null: false
+    t.bigint "company_id", null: false
+    t.integer "quantity", null: false
+    t.decimal "unit_price", precision: 10, scale: 2, null: false
+    t.decimal "total_price", precision: 10, scale: 2, null: false
+    t.date "sale_date", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "created_at"], name: "index_sales_on_company_and_created_at"
+    t.index ["company_id"], name: "index_sales_on_company_id"
+    t.index ["item_id"], name: "index_sales_on_item_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -58,7 +91,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_08_14_132055) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "inventories", "companies"
+  add_foreign_key "inventories", "items"
+  add_foreign_key "inventories", "purchases"
+  add_foreign_key "inventories", "sales"
   add_foreign_key "items", "companies"
+  add_foreign_key "purchases", "companies"
   add_foreign_key "purchases", "items"
+  add_foreign_key "sales", "companies"
+  add_foreign_key "sales", "items"
   add_foreign_key "users", "companies"
 end

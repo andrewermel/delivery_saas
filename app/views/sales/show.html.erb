@@ -1,0 +1,22 @@
+<% content_for :title, @sale.item.name %>
+
+<div class="mb-3">
+  <%= link_to "← Voltar", sales_path, class: "btn btn-outline-secondary" %>
+</div>
+
+<div class="card shadow">
+  <div class="card-header bg-light">
+    <h4><%= @sale.item.name %></h4>
+  </div>
+  <div class="card-body">
+    <p><strong>Quantidade:</strong> <%= @sale.quantity %>un</p>
+    <p><strong>Preço Unitário:</strong> <%= number_to_currency(@sale.unit_price) %></p>
+    <p><strong>Preço Total:</strong> <%= number_to_currency(@sale.total_price) %></p>
+    <p><strong>Data da Venda:</strong> <%= I18n.l(@sale.sale_date) %></p>
+    <p><strong>Estoque Atual:</strong> <%= @sale.item.available_stock %>un</p>
+  </div>
+  <div class="card-footer">
+    <%= link_to "Editar", edit_sale_path(@sale), class: "btn btn-secondary" %>
+    <%= link_to "Deletar", @sale, method: :delete, data: { confirm: "Tem certeza?" }, class: "btn btn-danger" %>
+  </div>
+</div>

@@ -1,16 +1,14 @@
-<p style="color: green"><%= notice %></p>
+<% content_for :title, "Compras" %>
 
-<% content_for :title, "Purchases" %>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3">Compras</h1>
+  <%= link_to "Nova compra", new_purchase_path, class: "btn btn-primary" %>
+ </div>
 
-<h1>Purchases</h1>
-
-<div id="purchases">
+<div id="purchases" class="row g-3">
   <% @purchases.each do |purchase| %>
-    <%= render purchase %>
-    <p>
-      <%= link_to "Show this purchase", purchase %>
-    </p>
+    <div class="col-md-6">
+      <%= render purchase %>
+    </div>
   <% end %>
 </div>
-
-<%= link_to "New purchase", new_purchase_path %>
