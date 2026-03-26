@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:15
+    container_name: delivery_saas_db
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: apppassword
+      POSTGRES_DB: ermeltech_saas_development
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        ['CMD-SHELL', 'pg_isready -U appuser -d postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: delivery_saas_app
+    command: bash -c "bundle lock --add-platform x86_64-linux && bundle install && bundle exec rails db:prepare && bundle exec rails s -b 0.0.0.0"
+    volumes:
+      - .:/app
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://appuser:apppassword@db:5432/ermeltech_saas_development
+      RAILS_ENV: development
+
+volumes:
+  postgres_data:

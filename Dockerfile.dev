@@ -1,0 +1,29 @@
+FROM ruby:3.3.9-slim
+
+# Instala dependencias do sistema necessarias para desenvolvimento
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      curl \
+      git \
+      libpq-dev \
+      libyaml-dev \
+      pkg-config && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+WORKDIR /app
+
+ENV RAILS_ENV=development \
+    BUNDLE_PATH=/usr/local/bundle
+
+# Copia Gemfile primeiro para aproveitar o cache do Docker
+# (so reinstala gems se o Gemfile mudar)
+COPY Gemfile Gemfile.lock ./
+# Adiciona a plataforma Linux ao lockfile (que foi gerado no Windows)
+# e entao instala os gems
+RUN bundle lock --add-platform x86_64-linux && bundle install
+
+# Copia o resto do codigo
+COPY . .
+
+EXPOSE 3000
