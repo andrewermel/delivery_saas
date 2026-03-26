@@ -41,6 +41,7 @@
             <li class="nav-item"><%= link_to "Itens", items_path, class: 'nav-link' %></li>
             <li class="nav-item"><%= link_to "Compras", purchases_path, class: 'nav-link' %></li>
             <li class="nav-item"><%= link_to "Vendas", sales_path, class: 'nav-link' %></li>
+            <li class="nav-item"><%= link_to "📦 Estoque", inventories_path, class: 'nav-link' %></li>
             <% if user_signed_in? %>
               <li class="nav-item"><%= link_to "Perfil", edit_user_registration_path, class: 'nav-link' %></li>
               <li class="nav-item"><%= link_to "Sair", destroy_user_session_path, method: :delete, class: 'nav-link' %></li>

@@ -1,0 +1,159 @@
+<h1 class="mb-4">📦 Estoque</h1>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card border-success mb-4">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">Total Investido em Estoque</h5>
+      </div>
+      <div class="card-body">
+        <h2 class="text-success">
+          R$ <%= number_with_precision(@total_invested, precision: 2) %>
+        </h2>
+        <p class="text-muted">Valor total de todos os itens em estoque (quantidade × preço médio)</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          Itens em Estoque
+          <span class="badge bg-primary"><%= @items_in_stock.count %></span>
+        </h5>
+      </div>
+      <div class="card-body">
+        <% if @items_in_stock.any? %>
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Item</th>
+                  <th class="text-end">Quantidade</th>
+                  <th class="text-end">Preço Médio (Custo)</th>
+                  <th class="text-end">Valor Total</th>
+                  <th class="text-center">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @items_in_stock.each do |item| %>
+                  <tr>
+                    <td class="align-middle">
+                      <strong><%= item.name %></strong>
+                      <br>
+                      <small class="text-muted">Peso: <%= item.weight %> un</small>
+                    </td>
+                    <td class="text-end align-middle">
+                      <span class="badge bg-info"><%= item.quantity_in_stock %> un</span>
+                    </td>
+                    <td class="text-end align-middle">
+                      R$ <%= number_with_precision(item.price, precision: 2) %>
+                    </td>
+                    <td class="text-end align-middle">
+                      <strong class="text-success">
+                        R$ <%= number_with_precision((item.price.to_f * item.quantity_in_stock), precision: 2) %>
+                      </strong>
+                    </td>
+                    <td class="text-center align-middle">
+                      <%= link_to "📊 Ver movimentações", show_transactions_inventories_path(item_id: item.id), class: "btn btn-sm btn-outline-primary" %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+              <tfoot class="table-light">
+                <tr>
+                  <th colspan="3" class="text-end">TOTAL INVESTIDO:</th>
+                  <th class="text-end">
+                    <strong class="text-success">
+                      R$ <%= number_with_precision(@total_invested, precision: 2) %>
+                    </strong>
+                  </th>
+                  <th></th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        <% else %>
+          <div class="alert alert-info mb-0">
+            <strong>Nenhum item em estoque</strong><br>
+            Faça uma <%= link_to "compra", purchases_path %> para adicionar itens ao estoque.
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">Últimas Movimentações</h5>
+      </div>
+      <div class="card-body">
+        <% if @inventory_movements.any? %>
+          <div class="table-responsive">
+            <table class="table table-sm table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Item</th>
+                  <th>Tipo</th>
+                  <th class="text-end">Quantidade</th>
+                  <th>Data</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @inventory_movements.each do |movement| %>
+                  <tr>
+                    <td>
+                      <small><%= movement.item&.name || "Item deletado" %></small>
+                    </td>
+                    <td>
+                      <% if movement.movement_type == "compra" %>
+                        <span class="badge bg-success">🔹 Entrada (Compra)</span>
+                      <% else %>
+                        <span class="badge bg-danger">🔸 Saída (Venda)</span>
+                      <% end %>
+                    </td>
+                    <td class="text-end">
+                      <% if movement.movement_type == "compra" %>
+                        <span class="text-success">+<%= movement.quantity_change %></span>
+                      <% else %>
+                        <span class="text-danger">-<%= movement.quantity_change %></span>
+                      <% end %>
+                    </td>
+                    <td>
+                      <small><%= movement.created_at.strftime("%d/%m/%Y %H:%M") %></small>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+          <div class="text-center mt-3">
+            <%= link_to "Ver todas as movimentações →", show_transactions_inventories_path, class: "btn btn-sm btn-outline-secondary" %>
+          </div>
+        <% else %>
+          <div class="alert alert-info mb-0">
+            Nenhuma movimentação registrada ainda.
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-4">
+  <div class="row">
+    <div class="col">
+      <%= link_to "← Voltar", root_path, class: "btn btn-secondary" %>
+    </div>
+    <div class="col text-end">
+      <%= link_to "📝 Nova Compra", new_purchase_path, class: "btn btn-primary" %>
+      <%= link_to "🛒 Nova Venda", new_sale_path, class: "btn btn-success" %>
+    </div>
+  </div>
+</div>

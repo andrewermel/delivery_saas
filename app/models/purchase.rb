@@ -4,36 +4,80 @@ class Purchase < ApplicationRecord
   has_one :inventory, dependent: :destroy
 
   validates :item_name, presence: true
-  validates :weight, presence: true, numericality: { greater_than: 0 }
+  validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
-  after_create :update_item_price_and_inventory
-  after_update :update_item_price_and_inventory
-  after_destroy :remove_from_inventory
+  after_create :handle_create
+  before_update :store_old_values
+  after_update :handle_update
+  after_destroy :handle_destroy
 
   private
 
-  def update_item_price_and_inventory
-    # Atualiza o preço médio do item
-    item.update(price: item.average_weighted_price) if item
+  def store_old_values
+    @old_quantity = quantity_was
+    @old_price = price_was
+  end
 
-    # Cria entrada de inventário (entrada de compra)
-    Inventory.create(
+  # Executa ao criar uma nova compra
+  def handle_create
+    return unless item
+
+    # Cria registro de entrada no inventário
+    Inventory.create!(
       item: item,
       company: company,
-      quantity_change: weight.to_i,
+      quantity_change: quantity.to_i,
       movement_type: 'purchase',
       purchase: self,
-      notes: "Compra de #{weight}un a R$#{price}"
-    ) if item
+      notes: "Compra de #{quantity}un por R$#{price} (R$#{(price.to_f / quantity).round(2)}/un)"
+    )
 
-    # Atualiza quantidade em estoque
-    item.increment!(:quantity_in_stock, weight.to_i) if item
+    # Aumenta o estoque
+    item.increment!(:quantity_in_stock, quantity.to_i)
+
+    # Recalcula preço médio
+    item.update(price: item.average_weighted_price)
   end
 
-  def remove_from_inventory
-    # Remove do estoque ao deletar compra
-    item.decrement!(:quantity_in_stock, weight.to_i) if item && quantity_in_stock > 0
-    inventory&.destroy
+  # Executa ao atualizar uma compra existente
+  def handle_update
+    return unless item
+
+    quantity_diff = quantity.to_i - @old_quantity.to_i
+
+    if quantity_diff != 0
+      # Atualiza Inventory record
+      if inventory
+        inventory.update(
+          quantity_change: quantity.to_i,
+          notes: "Compra ajustada: #{quantity.to_i}un a R$#{price} (era #{@old_quantity}un a R$#{@old_price})"
+        )
+      end
+
+      # Ajusta estoque
+      if quantity_diff > 0
+        item.increment!(:quantity_in_stock, quantity_diff)
+      else
+        item.decrement!(:quantity_in_stock, quantity_diff.abs)
+      end
+    end
+
+    # Sempre recalcula preço após edição
+    item.update(price: item.average_weighted_price)
+  end
+
+  # Executa ao deletar uma compra
+  def handle_destroy
+    return unless item
+
+    # Remove do estoque
+    item.decrement!(:quantity_in_stock, quantity.to_i)
+
+    # Recalcula preço médio
+    item.update(price: item.average_weighted_price)
+
+    # Inventory é deletado automaticamente pela dependência
   end
 end
+

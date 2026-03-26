@@ -76,7 +76,7 @@ class PurchasesController < ApplicationController
 
     # Corrigir o purchase_params (expect está errado, deve ser require)
     def purchase_params
-      params.require(:purchase).permit(:item_name, :item_id, :price, :weight)
+      params.require(:purchase).permit(:item_name, :item_id, :price, :quantity)
     end
 
     def update_item_price(item_id)

@@ -1,41 +1,46 @@
-<%= form_with(model: purchase) do |form| %>
+<%= form_with(model: purchase, class: "row g-3") do |form| %>
   <% if purchase.errors.any? %>
-    <div style="color: red">
-      <h2><%= pluralize(purchase.errors.count, "error") %> prohibited this purchase from being saved:</h2>
-
-      <ul>
-        <% purchase.errors.each do |error| %>
-          <li><%= error.full_message %></li>
+    <div class="alert alert-danger col-12">
+      <h4><%= pluralize(purchase.errors.count, "erro") %> ao salvar:</h4>
+      <ul class="mb-0">
+        <% purchase.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
         <% end %>
       </ul>
     </div>
   <% end %>
 
-  <div>
-    <%= form.label :item_name, style: "display: block" %>
-    <%= form.text_field :item_name %>
+  <div class="col-md-6">
+    <%= form.label :item_name, "Nome do Item" %>
+    <%= form.text_field :item_name, class: "form-control", placeholder: "Produto da compra" %>
+    <small class="form-text text-muted">Nome do item comprado</small>
   </div>
 
-  <div>
-    <%= form.label :item_id, "Selecione o Item", style: "display: block" %>
+  <div class="col-md-6">
+    <%= form.label :item_id, "Selecione o Item (Opcional)" %>
     <%= form.collection_select :item_id, 
                             current_user.company.items.order(:name),
                             :id,
                             :name,
-                            { prompt: "Escolha o item" } %>
+                            { prompt: "Escolha o item para atualizar estoque" },
+                            class: "form-control" %>
+    <small class="form-text text-muted">Se deixar em branco, apenas registra a compra</small>
   </div>
 
-  <div>
-    <%= form.label :price, style: "display: block" %>
-    <%= form.text_field :price %>
+  <div class="col-md-6">
+    <%= form.label :quantity, "Quantidade (Unidades)" %>
+    <%= form.number_field :quantity, class: "form-control", placeholder: "Ex: 10", step: 1 %>
+    <small class="form-text text-muted">Quantas unidades você comprou</small>
   </div>
 
-  <div>
-    <%= form.label :weight, style: "display: block" %>
-    <%= form.text_field :weight %>
+  <div class="col-md-6">
+    <%= form.label :price, "Preço Total da Nota (R$)" %>
+    <%= form.number_field :price, class: "form-control", placeholder: "Ex: 250.00", step: 0.01 %>
+    <small class="form-text text-muted">Preço TOTAL da nota fiscal (será dividido pela quantidade)</small>
   </div>
 
-  <div>
-    <%= form.submit %>
+  <div class="col-12">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Cancelar", purchases_path, class: "btn btn-secondary" %>
   </div>
 <% end %>

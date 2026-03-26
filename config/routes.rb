@@ -2,6 +2,11 @@ Rails.application.routes.draw do
   resources :purchases
   resources :sales
   resources :items
+  resources :inventories, only: [:index] do
+    collection do
+      get :show_transactions
+    end
+  end
   devise_for :users
   resources :companies
 
