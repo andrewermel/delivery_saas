@@ -27,8 +27,6 @@ class PurchasesController < ApplicationController
     respond_to do |format|
       if @purchase.save
 
-        update_item_price(@purchase.item_id)
-
         format.html { redirect_to @purchase, notice: "Purchase was successfully created." }
         format.json { render :show, status: :created, location: @purchase }
       else
@@ -42,7 +40,6 @@ class PurchasesController < ApplicationController
  def update
     respond_to do |format|
       if @purchase.update(purchase_params)
-        update_item_price(@purchase.item_id)  # Adicionando esta linha
         format.html { redirect_to @purchase, notice: "Purchase was successfully updated.", status: :see_other }
         format.json { render :show, status: :ok, location: @purchase }
       else
@@ -54,9 +51,7 @@ class PurchasesController < ApplicationController
 
   # DELETE /purchases/1 or /purchases/1.json
   def destroy
-    item_id = @purchase.item_id  # Guarda o item_id antes de deletar
     @purchase.destroy!
-    update_item_price(item_id)   # Atualiza o preço após deletar
 
     respond_to do |format|
       format.html { redirect_to purchases_path, notice: "Purchase was successfully destroyed.", status: :see_other }
@@ -77,18 +72,5 @@ class PurchasesController < ApplicationController
     # Corrigir o purchase_params (expect está errado, deve ser require)
     def purchase_params
       params.require(:purchase).permit(:item_name, :item_id, :price, :quantity)
-    end
-
-    def update_item_price(item_id)
-      return unless item_id.present?
-
-      item = current_company.items.find_by(id: item_id)
-      return unless item.present?
-
-      # Calculando média apenas das compras da mesma empresa
-      average_price = Purchase.where(company_id: current_company.id, item_id: item_id)
-                            .average(:price) || 0
-
-      item.update(price: average_price)
     end
 end

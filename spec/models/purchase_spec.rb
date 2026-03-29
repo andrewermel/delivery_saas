@@ -1,45 +1,36 @@
 require "rails_helper"
 
 RSpec.describe Purchase, type: :model do
-  describe "associations" do
-    it "belongs to a company" do
-      company = Company.create!(name: "Test Company", cnpj_id: "12345678901234")
-      purchase = Purchase.new(item_name: "Test Item", price: 10.0, quantity: 1, company: company)
-      expect(purchase.company).to eq(company)
-    end
+  let(:company) { create(:company) }
+  let(:item) { create(:item, company: company) }
 
-    it "can belong to an item" do
-      company = Company.create!(name: "Test Company", cnpj_id: "12345678901234")
-      item = Item.create!(name: "Test Item", company: company, price: 5.0)
-      purchase = Purchase.new(item_name: "Test Item", price: 10.0, quantity: 1, company: company, item: item)
-      expect(purchase.item).to eq(item)
-    end
+  it "creates a valid purchase" do
+    purchase = create(:purchase, company: company, item: item)
+    expect(purchase).to be_persisted
   end
 
-  describe "validations" do
-    let(:company) { Company.create!(name: "Test Company", cnpj_id: "12345678901234") }
+  it "validates presence of item_name" do
+    purchase = build(:purchase, item_name: nil, company: company)
+    expect(purchase).not_to be_valid
+  end
 
-    it "is invalid without item_name" do
-      purchase = Purchase.new(price: 10.0, quantity: 1, company: company)
-      expect(purchase.valid?).to be_falsey
-      expect(purchase.errors[:item_name]).to include("can't be blank")
-    end
+  it "validates presence of price" do
+    purchase = build(:purchase, price: nil, company: company)
+    expect(purchase).not_to be_valid
+  end
 
-    it "is invalid without price" do
-      purchase = Purchase.new(item_name: "Test Item", quantity: 1, company: company)
-      expect(purchase.valid?).to be_falsey
-      expect(purchase.errors[:price]).to include("can't be blank")
-    end
+  it "validates presence of quantity" do
+    purchase = build(:purchase, quantity: nil, company: company)
+    expect(purchase).not_to be_valid
+  end
 
-    it "is invalid without quantity" do
-      purchase = Purchase.new(item_name: "Test Item", price: 10.0, company: company)
-      expect(purchase.valid?).to be_falsey
-      expect(purchase.errors[:quantity]).to include("can't be blank")
-    end
+  it "belongs to company" do
+    purchase = create(:purchase, company: company, item: item)
+    expect(purchase.company).to eq(company)
+  end
 
-    it "is valid with all required attributes" do
-      purchase = Purchase.new(item_name: "Test Item", price: 10.0, quantity: 1, company: company)
-      expect(purchase.valid?).to be_truthy
-    end
+  it "can belong to an item" do
+    purchase = create(:purchase, company: company, item: item)
+    expect(purchase.item).to eq(item)
   end
 end

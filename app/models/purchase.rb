@@ -8,9 +8,12 @@ class Purchase < ApplicationRecord
   validates :price, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   after_create :handle_create
+  after_create_commit :recalculate_item_price
   before_update :store_old_values
   after_update :handle_update
+  after_update_commit :recalculate_price_after_update
   after_destroy :handle_destroy
+  after_destroy_commit :recalculate_price_after_destroy
 
   private
 
@@ -35,9 +38,15 @@ class Purchase < ApplicationRecord
 
     # Aumenta o estoque
     item.increment!(:quantity_in_stock, quantity.to_i)
+  end
 
-    # Recalcula preço médio
-    item.update(price: item.average_weighted_price)
+  # Recalcula preço DEPOIS que a transação foi commitada
+  def recalculate_item_price
+    return unless item
+    
+    new_price = item.average_weighted_price
+    item.update!(price: new_price)
+    Rails.logger.info("[PURCHASE CREATE] Item #{item.id} updated: price=#{new_price}, stock=#{item.quantity_in_stock}")
   end
 
   # Executa ao atualizar uma compra existente
@@ -62,9 +71,12 @@ class Purchase < ApplicationRecord
         item.decrement!(:quantity_in_stock, quantity_diff.abs)
       end
     end
+  end
 
-    # Sempre recalcula preço após edição
-    item.update(price: item.average_weighted_price)
+  # Recalcula preço após update ser commitado
+  def recalculate_price_after_update
+    return unless item
+    item.update!(price: item.average_weighted_price)
   end
 
   # Executa ao deletar uma compra
@@ -74,10 +86,13 @@ class Purchase < ApplicationRecord
     # Remove do estoque
     item.decrement!(:quantity_in_stock, quantity.to_i)
 
-    # Recalcula preço médio
-    item.update(price: item.average_weighted_price)
-
     # Inventory é deletado automaticamente pela dependência
+  end
+
+  # Recalcula preço após delete ser commitado
+  def recalculate_price_after_destroy
+    return unless item
+    item.update!(price: item.average_weighted_price)
   end
 end
 
