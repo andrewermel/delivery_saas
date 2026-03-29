@@ -9,11 +9,30 @@ class InventoriesController < ApplicationController
   end
 
   def show_transactions
-    @movements = Inventory.where(company_id: @current_company.id)
-                          .includes(:item, :purchase, :sale)
-                          .order(created_at: :desc)
-                          .page(params[:page])
-                          .per(25)
+    # Filtro por mês
+    @selected_month = params[:month].to_i
+    @selected_year = params[:year].to_i
+    @selected_month = Date.today.month if @selected_month.zero?
+    @selected_year = Date.today.year if @selected_year.zero?
+    
+    # Período do mês selecionado
+    start_date = Date.new(@selected_year, @selected_month, 1)
+    end_date = start_date.end_of_month
+    
+    # Paginação manual
+    @page = (params[:page] || 1).to_i
+    @per_page = 25
+    
+    # Buscar movimentações do mês
+    all_movements = Inventory.where(company_id: @current_company.id)
+                            .where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+                            .includes(:item, :purchase, :sale)
+                            .order(created_at: :desc)
+    
+    # Paginação
+    @total_movements = all_movements.count
+    @total_pages = (@total_movements / @per_page.to_f).ceil
+    @movements = all_movements.offset((@page - 1) * @per_page).limit(@per_page)
   end
 
   private

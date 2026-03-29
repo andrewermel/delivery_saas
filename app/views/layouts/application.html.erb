@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Ermeltech Saas" %></title>
+    <title><%= content_for(:title) || "NovoAlento" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -19,6 +19,9 @@
 
     <%# Bootstrap (quick dev improvement via CDN) %>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <%# Premium Custom Styles %>
+    <link href="/stylesheets/premium.css" rel="stylesheet">
 
     <%# Includes application stylesheet %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
@@ -28,24 +31,35 @@
 
   <body>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
-      <div class="container">
-        <a class="navbar-brand" href="<%= root_path %>">Ermeltech Saas</a>
+    <nav class="navbar navbar-expand-lg">
+      <div class="container-fluid px-4">
+        <a class="navbar-brand" href="<%= root_path %>">
+          <strong>NovoAlento</strong> <span style="color: #f59e0b;">✨</span>
+        </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="#navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><%= link_to "Início", root_path, class: 'nav-link' %></li>
-            <li class="nav-item"><%= link_to "Empresas", companies_path, class: 'nav-link' %></li>
-            <li class="nav-item"><%= link_to "Itens", items_path, class: 'nav-link' %></li>
-            <li class="nav-item"><%= link_to "Compras", purchases_path, class: 'nav-link' %></li>
-            <li class="nav-item"><%= link_to "Vendas", sales_path, class: 'nav-link' %></li>
-            <li class="nav-item"><%= link_to "📦 Estoque", inventories_path, class: 'nav-link' %></li>
+          <ul class="navbar-nav ms-auto align-items-center gap-1">
             <% if user_signed_in? %>
-              <li class="nav-item"><%= link_to "Perfil", edit_user_registration_path, class: 'nav-link' %></li>
-              <li class="nav-item"><%= link_to "Sair", destroy_user_session_path, method: :delete, class: 'nav-link' %></li>
+              <li class="nav-item"><%= link_to "📊 Dashboard", dashboard_path, class: 'nav-link' %></li>
+              <li class="nav-item"><%= link_to "🏢 Empresas", companies_path, class: 'nav-link' %></li>
+              <li class="nav-item"><%= link_to "📦 Itens", items_path, class: 'nav-link' %></li>
+              <li class="nav-item"><%= link_to "📥 Compras", purchases_path, class: 'nav-link' %></li>
+              <li class="nav-item"><%= link_to "🛒 Vendas", sales_path, class: 'nav-link' %></li>
+              <li class="nav-item"><%= link_to "📈 Estoque", inventories_path, class: 'nav-link' %></li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  👤 Perfil
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="profileDropdown">
+                  <li><%= link_to "Editar Perfil", edit_user_registration_path, class: 'dropdown-item' %></li>
+                  <li><hr class="dropdown-divider"></li>
+                  <li><%= link_to "Sair", destroy_user_session_path, method: :delete, class: 'dropdown-item text-danger' %></li>
+                </ul>
+              </li>
             <% else %>
+              <li class="nav-item"><%= link_to "Início", root_path, class: 'nav-link' %></li>
               <li class="nav-item"><%= link_to "Entrar", new_user_session_path, class: 'nav-link' %></li>
               <li class="nav-item"><%= link_to "Registrar-se", new_user_registration_path, class: 'nav-link btn btn-primary text-white ms-2' %></li>
             <% end %>
@@ -65,6 +79,45 @@
 
     <%= yield %> <!-- aqui fica o conteúdo de cada página -->
   </main>
+
+  <!-- Footer -->
+  <footer style="background: linear-gradient(135deg, #1a365d 0%, #2d5a8c 100%); color: white; margin-top: 4rem; padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div class="container py-4">
+      <div class="row g-5">
+        <div class="col-md-4">
+          <h5 style="color: #f59e0b; font-weight: 700; margin-bottom: 1rem;">NovoAlento</h5>
+          <p style="opacity: 0.9; font-size: 0.9rem;">
+            <strong>Respire novamente, cresça sempre.</strong><br><br>
+            Gerencie seu estoque com inteligência. Uma solução completa para reconstruir seu negócio com confiança.
+          </p>
+        </div>
+        <div class="col-md-4">
+          <h6 style="font-weight: 700; margin-bottom: 1rem;">Produto</h6>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <li><a href="<%= dashboard_path %>" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Dashboard</a></li>
+            <li><a href="<%= inventories_path %>" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Estoque</a></li>
+            <li><a href="<%= sales_path %>" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Vendas</a></li>
+          </ul>
+        </div>
+        <div class="col-md-4">
+          <h6 style="font-weight: 700; margin-bottom: 1rem;">Conta</h6>
+          <ul style="list-style: none; padding: 0; margin: 0;">
+            <% if user_signed_in? %>
+              <li><a href="<%= edit_user_registration_path %>" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Perfil</a></li>
+              <li><a href="#" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Configurações</a></li>
+            <% else %>
+              <li><a href="<%= new_user_session_path %>" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Entrar</a></li>
+              <li><a href="<%= new_user_registration_path %>" style="color: rgba(255,255,255,0.8); text-decoration: none; transition: color 0.3s;" onmouseover="this.style.color='#f59e0b'" onmouseout="this.style.color='rgba(255,255,255,0.8)'">Registrar-se</a></li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+      <hr style="border-color: rgba(255,255,255,0.2); margin: 2rem 0;">
+      <div style="text-align: center; opacity: 0.8; font-size: 0.85rem;">
+        <p style="margin: 0;">© <%= Date.today.year %> NovoAlento. Todos os direitos reservados.</p>
+      </div>
+    </div>
+  </footer>
 
 </body>
 

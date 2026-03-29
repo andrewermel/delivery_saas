@@ -3,8 +3,8 @@
 <%= render @company %>
 
 <div>
-  <%= link_to "Edit this company", edit_company_path(@company) %> |
-  <%= link_to "Back to companies", companies_path %>
+  <%= link_to "Editar esta empresa", edit_company_path(@company) %> |
+  <%= link_to "Voltar para empresas", companies_path %>
 
-  <%= button_to "Destroy this company", @company, method: :delete %>
+  <%= button_to "Deletar esta empresa", @company, method: :delete %>
 </div>

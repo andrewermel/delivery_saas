@@ -1,0 +1,192 @@
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-6">📊 Histórico de Movimentações</h1>
+      <p class="text-muted">Acompanhe todas as transações de estoque</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <div class="btn-group" role="group">
+        <%= link_to "📝 Nova Compra", new_purchase_path, class: "btn btn-primary" %>
+        <%= link_to "🛒 Nova Venda", new_sale_path, class: "btn btn-success" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtro por Mês -->
+  <div class="row mb-4">
+    <div class="col-md-12">
+      <div class="card bg-light border-secondary">
+        <div class="card-body">
+          <%= form_with url: show_transactions_inventories_path, method: :get, local: true, class: "row g-3 align-items-end" do |f| %>
+            <div class="col-auto">
+              <label for="month" class="form-label">Mês</label>
+              <%= select_tag :month, 
+                  options_for_select([
+                    ['Janeiro', 1], ['Fevereiro', 2], ['Março', 3], ['Abril', 4],
+                    ['Maio', 5], ['Junho', 6], ['Julho', 7], ['Agosto', 8],
+                    ['Setembro', 9], ['Outubro', 10], ['Novembro', 11], ['Dezembro', 12]
+                  ], @selected_month),
+                  class: "form-select", id: "month" %>
+            </div>
+            <div class="col-auto">
+              <label for="year" class="form-label">Ano</label>
+              <%= select_tag :year, 
+                  options_for_select((2024..Date.today.year).map { |y| [y, y] }, @selected_year),
+                  class: "form-select", id: "year" %>
+            </div>
+            <div class="col-auto">
+              <%= submit_tag "Filtrar", class: "btn btn-primary" %>
+              <%= link_to "Limpar", show_transactions_inventories_path, class: "btn btn-outline-secondary" %>
+            </div>
+          <% end %>
+          <small class="text-muted d-block mt-2">
+            Mostrando <strong><%= @movements.count %> de <%= @total_movements %></strong> movimentações de <strong><%= Date.new(@selected_year, @selected_month, 1).strftime("%B/%Y") %></strong>
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela de Transações -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">Transações de Estoque</h5>
+        </div>
+        <div class="card-body">
+          <% if @movements.any? %>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Data</th>
+                    <th>Item</th>
+                    <th>Tipo de Movimentação</th>
+                    <th class="text-end">Quantidade</th>
+                    <th>Detalhes</th>
+                    <th>Referência</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @movements.each do |movement| %>
+                    <tr>
+                      <td class="align-middle">
+                        <small><strong><%= movement.created_at.strftime("%d/%m/%Y") %></strong><br><%= movement.created_at.strftime("%H:%M:%S") %></small>
+                      </td>
+                      <td class="align-middle">
+                        <% if movement.item %>
+                          <strong><%= movement.item.name %></strong><br>
+                          <small class="text-muted">Preço: R$ <%= number_with_precision(movement.item.price, precision: 2) %></small>
+                        <% else %>
+                          <span class="text-muted">Item deletado</span>
+                        <% end %>
+                      </td>
+                      <td class="align-middle">
+                        <% if movement.movement_type == "purchase" %>
+                          <span class="badge bg-success">🔹 Entrada (Compra)</span>
+                        <% else %>
+                          <span class="badge bg-danger">🔸 Saída (Venda)</span>
+                        <% end %>
+                      </td>
+                      <td class="text-end align-middle">
+                        <% if movement.movement_type == "purchase" %>
+                          <span class="text-success">
+                            <strong>+ <%= movement.quantity_change %> un</strong>
+                          </span>
+                        <% else %>
+                          <span class="text-danger">
+                            <strong><%= movement.quantity_change %> un</strong>
+                          </span>
+                        <% end %>
+                      </td>
+                      <td class="align-middle">
+                        <small>
+                          <% if movement.notes %>
+                            <%= truncate(movement.notes, length: 50) %>
+                          <% else %>
+                            <span class="text-muted">-</span>
+                          <% end %>
+                        </small>
+                      </td>
+                      <td class="align-middle">
+                        <% if movement.movement_type == "purchase" && movement.purchase %>
+                          <small class="badge bg-info">
+                            Compra #<%= movement.purchase_id %>
+                          </small>
+                        <% elsif movement.movement_type == "sale" && movement.sale %>
+                          <small class="badge bg-warning text-dark">
+                            Venda #<%= movement.sale_id %>
+                          </small>
+                        <% else %>
+                          <small class="text-muted">-</small>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Paginação Manual -->
+            <% if @total_pages > 1 %>
+              <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                  <!-- Página Anterior -->
+                  <% if @page > 1 %>
+                    <li class="page-item">
+                      <%= link_to "← Anterior", show_transactions_inventories_path(month: @selected_month, year: @selected_year, page: @page - 1), class: "page-link" %>
+                    </li>
+                  <% else %>
+                    <li class="page-item disabled">
+                      <span class="page-link">← Anterior</span>
+                    </li>
+                  <% end %>
+
+                  <!-- Números de Página -->
+                  <% (1..@total_pages).each do |p| %>
+                    <% if p == @page %>
+                      <li class="page-item active">
+                        <span class="page-link"><%= p %></span>
+                      </li>
+                    <% else %>
+                      <li class="page-item">
+                        <%= link_to p, show_transactions_inventories_path(month: @selected_month, year: @selected_year, page: p), class: "page-link" %>
+                      </li>
+                    <% end %>
+                  <% end %>
+
+                  <!-- Próxima Página -->
+                  <% if @page < @total_pages %>
+                    <li class="page-item">
+                      <%= link_to "Próxima →", show_transactions_inventories_path(month: @selected_month, year: @selected_year, page: @page + 1), class: "page-link" %>
+                    </li>
+                  <% else %>
+                    <li class="page-item disabled">
+                      <span class="page-link">Próxima →</span>
+                    </li>
+                  <% end %>
+                </ul>
+              </nav>
+            <% end %>
+          <% else %>
+            <div class="alert alert-info mb-0">
+              <strong>Nenhuma movimentação registrada</strong><br>
+              Não há movimentações para o período selecionado. Quando você fizer compras ou vendas, elas aparecerão aqui.
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botões de Ação -->
+  <div class="mt-4">
+    <div class="row">
+      <div class="col">
+        <%= link_to "← Voltar ao Estoque", inventories_path, class: "btn btn-secondary" %>
+      </div>
+    </div>
+  </div>
+</div>

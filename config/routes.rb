@@ -10,9 +10,13 @@ Rails.application.routes.draw do
   devise_for :users
   resources :companies
 
+  # Pages routes
+  get "dashboard", to: "pages#dashboard", as: :dashboard
+  get "home", to: "pages#home", as: :home
+
   # Health check endpoint
   get "up" => "rails/health#show", as: :rails_health_check
 
   # Define root path
-  root to: "companies#index"
+  root to: "pages#home"
 end
