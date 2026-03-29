@@ -2,6 +2,7 @@ class SalesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_sale, only: %i[show edit update destroy]
   before_action :set_current_company
+  before_action :verify_company_access, only: %i[create]
 
   def index
     @sales = @current_company.sales.includes(:item).order(created_at: :desc)
@@ -64,16 +65,21 @@ class SalesController < ApplicationController
   private
 
   def set_sale
-    @sale = Sale.find(params[:id])
-    authorize_sale!
+    @sale = @current_company.sales.find_by!(id: params[:id])
+  rescue ActiveRecord::RecordNotFound
+    redirect_to sales_path, alert: "Venda não encontrada."
   end
 
   def set_current_company
     @current_company = current_user.company
   end
 
-  def authorize_sale!
-    redirect_to sales_path, alert: "Não autorizado." unless @sale.company == @current_company
+  def verify_company_access
+    # Verify no items from other companies are being used
+    if params[:sale] && params[:sale][:item_id].present?
+      item = Item.find(params[:sale][:item_id])
+      redirect_to sales_path, alert: "Você não tem permissão para usar esse item." unless item.company_id == @current_company.id
+    end
   end
 
   def sale_params

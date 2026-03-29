@@ -190,11 +190,32 @@
                     <th style="color: #1a365d; font-weight: 700; padding: 1rem;">Item</th>
                     <th style="color: #1a365d; font-weight: 700; padding: 1rem;">Tipo</th>
                     <th class="text-end" style="color: #1a365d; font-weight: 700; padding: 1rem;">Quantidade</th>
+                    <th class="text-end" style="color: #1a365d; font-weight: 700; padding: 1rem;">Valor</th>
                   </tr>
                 </thead>
                 <tbody>
                   <% @recent_movements.each do |movement| %>
-                    <tr style="border-bottom: 1px solid #e2e8f0;">
+                    <% 
+                      # Determine link based on movement type
+                      if movement.movement_type == "purchase" && movement.purchase
+                        link_path = purchase_path(movement.purchase)
+                      elsif movement.movement_type == "sale" && movement.sale
+                        link_path = sale_path(movement.sale)
+                      else
+                        link_path = nil
+                      end
+                      
+                      # Get REAL value from purchase or sale
+                      value = if movement.movement_type == "purchase" && movement.purchase
+                        movement.purchase.price.to_f
+                      elsif movement.movement_type == "sale" && movement.sale
+                        movement.sale.total_price.to_f
+                      else
+                        0
+                      end
+                    %>
+                    <%= link_to dashboard_path, method: :get, onclick: "window.location.href='#{link_path}'; return false;" if link_path %>
+                    <tr style="border-bottom: 1px solid #e2e8f0; <%= link_path ? 'cursor: pointer;' : '' %>" onmouseover="<%= link_path ? "this.style.backgroundColor='#f1f5f9'" : "" %>" onmouseout="<%= link_path ? "this.style.backgroundColor=''" : "" %>" onclick="<%= link_path ? "window.location.href='#{link_path}'" : "" %>">
                       <td style="padding: 1rem;"><small style="color: #64748b;"><strong><%= movement.created_at.strftime("%d/%m %H:%M") %></strong></small></td>
                       <td style="padding: 1rem;">
                         <small style="color: #1a365d; font-weight: 500;">
@@ -218,6 +239,9 @@
                         <% else %>
                           <span style="color: #ef4444; font-weight: 600;"><%= movement.quantity_change %> un</span>
                         <% end %>
+                      </td>
+                      <td class="text-end" style="padding: 1rem;">
+                        <strong style="color: #1a365d;">R$ <%= number_with_precision(value, precision: 2) %></strong>
                       </td>
                     </tr>
                   <% end %>

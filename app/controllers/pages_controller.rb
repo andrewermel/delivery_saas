@@ -51,8 +51,8 @@ class PagesController < ApplicationController
   private
 
   def calculate_total_invested
-    @current_company.items.where("quantity_in_stock > 0").sum do |item|
-      (item.price.to_f * item.quantity_in_stock).round(2)
-    end
+    # O campo "price" em purchases é o TOTAL da compra, não unitário
+    # Então basta somar todos os preços das compras
+    @current_company.purchases.sum(:price).to_f.round(2)
   end
 end

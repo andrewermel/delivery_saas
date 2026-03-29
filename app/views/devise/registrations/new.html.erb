@@ -21,17 +21,6 @@
     <%= f.password_field :password_confirmation, autocomplete: "new-password" %>
   </div>
 
-  <div class="field">
-    <%= f.label :company_id, "Empresa" %>
-    <%= f.collection_select :company_id, Company.all, :id, :name, prompt: "Selecione uma empresa" %>
-  </div>
-
-   <div class="field">
-    <%= f.label :role, "Função" %><br />
-    <%= f.select :role, User.roles.keys.map { |r| [r.humanize, r] }, prompt: "Selecione a função" %>
-  </div>
-
-
   <div class="actions">
     <%= f.submit "Registrar-se" %>
   </div>
