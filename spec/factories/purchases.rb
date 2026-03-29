@@ -3,7 +3,7 @@ FactoryBot.define do
   factory :purchase do
     item_name { "Item Purchase" }
     price { 20.0 }
-    weight { 5.0 }
+    quantity { 1 }
     association :company
     association :item
   end

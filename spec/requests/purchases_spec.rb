@@ -3,13 +3,13 @@ require "rails_helper"
 RSpec.describe "/purchases", type: :request do
   let(:company) { create(:company) }
   let(:user) { create(:user, company: company) }
-  let(:item) { create(:item, company: company) } # <-- create an item to satisfy foreign key
+  let(:item) { create(:item, company: company) }
 
   let(:valid_attributes) do
     {
       item_name: "Item A",
       price: 100,
-      weight: 10,
+      quantity: 1,
       company_id: company.id,
       item_id: item.id
     }
@@ -19,16 +19,14 @@ RSpec.describe "/purchases", type: :request do
     {
       item_name: "",
       price: nil,
-      weight: nil,
+      quantity: nil,
       company_id: nil,
       item_id: nil
     }
   end
 
   before do
-    # Simulate logged-in user without Devise
-    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
-    allow_any_instance_of(ApplicationController).to receive(:authenticate_user!).and_return(true)
+    sign_in user
   end
 
   describe "GET /index" do
