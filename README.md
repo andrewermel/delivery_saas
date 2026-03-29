@@ -1,6 +1,12 @@
-# Delivery SaaS
+# 🌟 NovoAlento
 
-Aplicação web multi-tenant para gestão de delivery, construída com **Ruby on Rails 8** e **PostgreSQL**. Inclui autenticação de usuários, gerenciamento de empresas, itens e pedidos.
+**Respire novamente, cresça sempre.**
+
+Plataforma SaaS de recuperação e gestão de negócios projetada para empreendedores que enfrentam desafios. NovoAlento oferece controle total sobre finanças, inventário e operações comerciais através de um dashboard intuitivo com métricas em tempo real.
+
+**Para negócios que precisam se reinventar. Para vidas que precisam continuar.**
+
+Construída com **Ruby on Rails 8** e **PostgreSQL**, com autenticação segura, gestão multi-tenant, análise financeira avançada e relatórios de inventário.
 
 ## Tecnologias
 
@@ -63,22 +69,33 @@ docker compose exec app bundle exec rails db:migrate
 docker compose exec app bundle exec rspec
 ```
 
-## Estrutura do banco
+## 📊 Funcionalidades Principais
 
-| Modelo     | Descrição                        |
-| ---------- | -------------------------------- |
-| `User`     | Usuário autenticado via Devise   |
-| `Company`  | Empresa cadastrada na plataforma |
-| `Item`     | Produto/item do cardápio         |
-| `Purchase` | Pedido realizado                 |
+- **Dashboard Financeiro** — Visualização em tempo real de receitas, despesas, margens e lucro líquido
+- **Gestão de Inventário** — Controle de produtos, estoque e histórico de transações
+- **Relatórios** — Análise de vendas e compras por período (mês/ano)
+- **Multi-tenant** — Suporte a múltiplas empresas por usuário
+- **Autenticação Segura** — Integração com Devise
+- **Interface Responsiva** — Design profissional optimizado para desktop e mobile
+- **Internacionalização** — 100% em português
 
-## Rotas principais
+## 🏗️ Estrutura do Banco
 
-| Rota             | Controller        |
-| ---------------- | ----------------- |
-| `/`              | `companies#index` |
-| `/companies`     | CRUD de empresas  |
-| `/items`         | CRUD de itens     |
-| `/purchases`     | CRUD de pedidos   |
-| `/users/sign_in` | Login (Devise)    |
-| `/users/sign_up` | Cadastro (Devise) |
+| Modelo     | Descrição                                           |
+| ---------- | --------------------------------------------------- |
+| `User`     | Usuário autenticado via Devise                      |
+| `Company`  | Negócio/empreendimento do usuário                   |
+| `Item`     | Produto ou serviço comercializado                   |
+| `Purchase` | Transação de compra ou venda com impacto financeiro |
+
+## 🗺️ Rotas Principais
+
+| Rota             | Funcionalidade                    |
+| ---------------- | --------------------------------- |
+| `/`              | Home e landing page               |
+| `/dashboard`     | Painel financeiro em tempo real   |
+| `/companies`     | Gerenciamento de negócios         |
+| `/items`         | Catálogo de produtos/serviços     |
+| `/purchases`     | Histórico e gestão de transações  |
+| `/users/sign_in` | Login (Devise)                    |
+| `/users/sign_up` | Cadastro de novo usuário (Devise) |

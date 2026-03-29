@@ -55,7 +55,12 @@
                 <ul class="dropdown-menu" aria-labelledby="profileDropdown">
                   <li><%= link_to "Editar Perfil", edit_user_registration_path, class: 'dropdown-item' %></li>
                   <li><hr class="dropdown-divider"></li>
-                  <li><%= link_to "Sair", destroy_user_session_path, method: :delete, class: 'dropdown-item text-danger' %></li>
+                  <li>
+                    <%= button_to "Sair", destroy_user_session_path, 
+                        method: :delete, 
+                        form_class: 'd-inline',
+                        class: 'dropdown-item text-danger border-0 bg-transparent w-100 text-start p-2' %>
+                  </li>
                 </ul>
               </li>
             <% else %>
