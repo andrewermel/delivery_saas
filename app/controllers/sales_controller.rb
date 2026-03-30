@@ -1,8 +1,8 @@
 class SalesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_sale, only: %i[show edit update destroy]
   before_action :set_current_company
-  before_action :verify_company_access, only: %i[create]
+  before_action :set_sale, only: %i[show edit update destroy]
+  before_action :verify_company_access, only: %i[create update destroy]
 
   def index
     @sales = @current_company.sales.includes(:item).order(created_at: :desc)
@@ -75,10 +75,9 @@ class SalesController < ApplicationController
   end
 
   def verify_company_access
-    # Verify no items from other companies are being used
     if params[:sale] && params[:sale][:item_id].present?
       item = Item.find(params[:sale][:item_id])
-      redirect_to sales_path, alert: "Você não tem permissão para usar esse item." unless item.company_id == @current_company.id
+      redirect_to sales_path, alert: "Unauthorized item access." unless item.company_id == @current_company.id
     end
   end
 

@@ -7,7 +7,6 @@ class Inventory < ApplicationRecord
   validates :quantity_change, presence: true, numericality: { only_integer: true }
   validates :movement_type, presence: true, inclusion: { in: %w(purchase sale) }
 
-  # Escopos úteis
   scope :purchases, -> { where(movement_type: 'purchase') }
   scope :sales, -> { where(movement_type: 'sale') }
   scope :by_company, ->(company) { where(company: company) }
