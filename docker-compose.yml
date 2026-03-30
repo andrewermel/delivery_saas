@@ -1,3 +1,11 @@
+version: '3.8'
+
+# ⚠️ ATENÇÃO: Nunca use 'docker compose down -v' pois APAGA todos os dados!
+# Use apenas:
+#   docker compose down      (para - containers)
+#   docker compose restart   (para reiniciar)
+#   docker compose up -d     (para iniciar)
+
 services:
   db:
     image: postgres:15
@@ -20,7 +28,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
     container_name: delivery_saas_app
-    command: bash -c "bundle lock --add-platform x86_64-linux && bundle install && bundle exec rails db:prepare && bundle exec rails s -b 0.0.0.0"
+    command: bash -c "rm -f tmp/pids/server.pid && bundle lock --add-platform x86_64-linux && bundle install && bundle exec rails db:prepare && bundle exec rails s -b 0.0.0.0"
     volumes:
       - .:/app
     ports:

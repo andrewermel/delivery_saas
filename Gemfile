@@ -40,6 +40,8 @@ group :development, :test do
   # Testing
   gem "rspec-rails", "~> 6.1"
   gem "factory_bot_rails"
+  gem "rspec_junit_formatter", require: false  # Para gerar relatórios XML
+  gem "simplecov", require: false  # Para cobertura de testes
 
   # Debugging
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
